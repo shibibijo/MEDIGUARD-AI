@@ -1,12 +1,12 @@
 :root {
-    --primary-color: #10b981; 
+    --primary-color: #10b981;
     --primary-gradient: linear-gradient(135deg, #10b981, #059669);
-    --bg-color: #f8fafc; 
-    --text-color: #1e293b; 
-    --text-light: #64748b; 
+    --bg-color: #f8fafc;
+    --text-color: #1e293b;
+    --text-light: #64748b;
     --card-bg: rgba(255, 255, 255, 0.85);
     --border-color: rgba(16, 185, 129, 0.2);
-    --error-color: #ef4444; 
+    --error-color: #ef4444;
     --success-color: #10b981;
 }
 
@@ -156,14 +156,16 @@ body {
 .spinner {
     width: 20px;
     height: 20px;
-    border: 2px solid rgba(255,255,255,0.3);
+    border: 2px solid rgba(255, 255, 255, 0.3);
     border-radius: 50%;
     border-top-color: white;
     animation: spin 1s linear infinite;
 }
 
 @keyframes spin {
-    to { transform: rotate(360deg); }
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 /* Hero Section */
@@ -302,7 +304,7 @@ body {
     padding: 2rem;
     border-radius: 1rem;
     border: 1px solid var(--border-color);
-    background: rgba(255,255,255,0.9);
+    background: rgba(255, 255, 255, 0.9);
 }
 
 .result-card h3 {
@@ -326,15 +328,20 @@ body {
     display: flex;
     justify-content: space-between;
     padding: 1rem 0;
-    border-bottom: 1px solid rgba(0,0,0,0.05);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .detail-row:last-child {
     border-bottom: none;
 }
 
-.prob-high { color: var(--error-color); }
-.prob-low { color: var(--success-color); }
+.prob-high {
+    color: var(--error-color);
+}
+
+.prob-low {
+    color: var(--success-color);
+}
 
 .reason-row {
     flex-direction: column;
@@ -429,9 +436,17 @@ body {
     font-weight: 500;
     font-size: 0.875rem;
 }
+
 @keyframes fadeInUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .highlight-btn {
@@ -439,9 +454,17 @@ body {
 }
 
 @keyframes shadowPulse {
-    0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
-    70% { box-shadow: 0 0 0 15px rgba(16, 185, 129, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+    0% {
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4);
+    }
+
+    70% {
+        box-shadow: 0 0 0 15px rgba(16, 185, 129, 0);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+    }
 }
 
 .app-header-internal {

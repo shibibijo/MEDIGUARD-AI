@@ -1,11 +1,12 @@
 const Tesseract = require('tesseract.js');
 const { spawn, spawnSync } = require('child_process');
 const path = require('path');
-const Claim = require('../models/Claim');
+const Claim = require('./Claim');
 const { fromPath } = require('pdf2pic');
 const fs = require('fs');
+const logger = require('./logger');
 
-const runPythonScript = (scriptPath, args) => {
+const runPythonScript = (scriptPath, inputData) => {
     return new Promise((resolve, reject) => {
         let pythonCommand = 'python';
         const python3Check = spawnSync('python3', ['--version']);
@@ -13,8 +14,8 @@ const runPythonScript = (scriptPath, args) => {
             pythonCommand = 'python3';
         }
 
-        const pythonProcess = spawn(pythonCommand, [scriptPath, ...args]);
-        
+        const pythonProcess = spawn(pythonCommand, [scriptPath]);
+
         let returnData = '';
         let returnError = '';
 
@@ -42,10 +43,13 @@ const runPythonScript = (scriptPath, args) => {
                 }
             }
         });
-        
+
         pythonProcess.on('error', (err) => {
             reject(err);
         });
+
+        pythonProcess.stdin.write(inputData);
+        pythonProcess.stdin.end();
     });
 };
 
@@ -56,13 +60,13 @@ exports.processClaim = async (req, res) => {
         }
 
         let filePath = req.file.path;
-        console.log(`Processing file: ${filePath}`);
+        logger.info(`Processing file: ${filePath}`);
 
         if (req.file.mimetype === 'application/pdf') {
-            console.log('PDF detected, converting first page to image...');
+            logger.info('PDF detected, converting first page to image...');
             const uploadDir = path.dirname(filePath);
             const baseName = path.basename(filePath, path.extname(filePath));
-            
+
             const options = {
                 density: 300,
                 saveFilename: baseName,
@@ -71,18 +75,18 @@ exports.processClaim = async (req, res) => {
                 width: 2480,
                 height: 3508
             };
-            
+
             const convert = fromPath(filePath, options);
             const pageToConvertAsImage = 1;
-            
+
             const resolveObj = await convert(pageToConvertAsImage, { responseType: "image" });
             filePath = resolveObj.path;
-            console.log(`PDF converted to image: ${filePath}`);
+            logger.info(`PDF converted to image: ${filePath}`);
         }
 
-        console.log('Starting OCR...');
+        logger.info('Starting OCR...');
         const { data: { text } } = await Tesseract.recognize(filePath, 'eng');
-        console.log('OCR Complete.');
+        logger.info('OCR Complete.');
 
         const textLower = text.toLowerCase();
         const textLength = text.length;
@@ -118,14 +122,18 @@ exports.processClaim = async (req, res) => {
             amount_mentioned: amountMentioned
         };
 
-        const predictScriptPath = path.join(__dirname, '../../ml-model/predict.py');
-        const nlpScriptPath = path.join(__dirname, '../../ml-model/nlp_extract.py');
+        const predictScriptPath = path.join(__dirname, 'predict.py');
+        const nlpScriptPath = path.join(__dirname, 'nlp_extract.py');
 
         try {
-            const [predictResult, nlpResult] = await Promise.all([
-                runPythonScript(predictScriptPath, [JSON.stringify(features)]),
-                runPythonScript(nlpScriptPath, [text])
-            ]);
+            const nlpResult = await runPythonScript(nlpScriptPath, text);
+
+            features.has_doctor_name = nlpResult.doctorName ? 1 : 0;
+            features.has_patient_name = nlpResult.patientName ? 1 : 0;
+            features.diagnosis_keyword_count = nlpResult.diagnosisKeywords ? nlpResult.diagnosisKeywords.length : 0;
+            features.has_date = nlpResult.dateOfTreatment ? 1 : 0;
+
+            const predictResult = await runPythonScript(predictScriptPath, JSON.stringify(features));
 
             let decision = 'Approved';
             let rejectionReason = '';
@@ -175,12 +183,12 @@ exports.processClaim = async (req, res) => {
             });
 
         } catch (scriptError) {
-            console.error("Python Script Error:", scriptError);
+            logger.error(`Python Script Error: ${scriptError.message}`);
             return res.status(500).json({ success: false, message: 'Python Processing Error', error: scriptError.message });
         }
 
     } catch (error) {
-        console.error("Upload process error:", error);
+        logger.error(`Upload process error: ${error.message}`);
         res.status(500).json({ success: false, message: "Server processing error." });
     }
 };

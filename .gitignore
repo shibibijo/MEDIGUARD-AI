@@ -1,1 +1,7 @@
 .env
+node_modules/
+ml-model/model.pkl
+ml-model/scaler.pkl
+uploads/
+__pycache__/
+*.pyc

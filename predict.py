@@ -9,10 +9,10 @@ warnings.filterwarnings('ignore')
 
 def main():
     try:
-        if len(sys.argv) < 2:
+        input_data = sys.stdin.read().strip()
+        if not input_data:
             raise Exception("No input data provided")
             
-        input_data = sys.argv[1]
         features = json.loads(input_data)
 
         script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -32,7 +32,11 @@ def main():
             features.get('text_length', 1000),
             features.get('has_critical_keywords', 0),
             features.get('has_fraud_keywords', 0),
-            features.get('amount_mentioned', 10000)
+            features.get('amount_mentioned', 10000),
+            features.get('has_doctor_name', 0),
+            features.get('has_patient_name', 0),
+            features.get('diagnosis_keyword_count', 0),
+            features.get('has_date', 0)
         ]])
 
         feat_scaled = scaler.transform(feat_array)

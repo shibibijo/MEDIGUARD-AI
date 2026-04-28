@@ -7,14 +7,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const loginBtn = document.getElementById('loginBtn');
     const userRoleBadge = document.getElementById('userRoleBadge');
     const logoutBtn = document.getElementById('logoutBtn');
-    
+
     // Check Auth State
     checkAuth();
 
     function checkAuth() {
         const token = localStorage.getItem('token');
         const user = JSON.parse(localStorage.getItem('user'));
-        
+
         if (token && user) {
             showMainApp(user);
         } else {
@@ -39,23 +39,23 @@ document.addEventListener('DOMContentLoaded', () => {
     // Handle Login
     loginForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        
+
         const username = document.getElementById('username').value;
         const password = document.getElementById('password').value;
-        
+
         loginBtn.disabled = true;
         loginBtn.querySelector('.spinner').classList.remove('hidden');
         loginError.classList.add('hidden');
-        
+
         try {
             const response = await fetch('/api/auth/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username, password })
             });
-            
+
             const data = await response.json();
-            
+
             if (response.ok && data.success) {
                 localStorage.setItem('token', data.token);
                 localStorage.setItem('user', JSON.stringify(data.user));
@@ -65,7 +65,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 loginError.classList.remove('hidden');
             }
         } catch (error) {
-            loginError.textContent = 'Server error. Please try again.';
+            if (error.name === 'TypeError' && error.message === 'Failed to fetch') {
+                loginError.textContent = 'Network error: Server is unreachable.';
+            } else {
+                loginError.textContent = 'Server error. Please try again.';
+            }
             loginError.classList.remove('hidden');
         } finally {
             loginBtn.disabled = false;
@@ -84,7 +88,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function initAnimations() {
         if (animationsInitialized) return;
         animationsInitialized = true;
-        
+
         if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
             gsap.registerPlugin(ScrollTrigger);
             gsap.to("#bg-steth", {
@@ -133,14 +137,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnText = checkBtn.querySelector('span');
     const spinner = checkBtn.querySelector('.spinner');
     const fileInputWrapper = document.querySelector('.file-input-wrapper');
-    
+    const uploadError = document.getElementById('uploadError');
+
     const resultCard = document.getElementById('resultCard');
     const statusIcon = document.getElementById('statusIcon');
     const decisionText = document.getElementById('decisionText');
     const probText = document.getElementById('probText');
     const reasonContainer = document.getElementById('reasonContainer');
     const reasonText = document.getElementById('reasonText');
-    
+
     // NLP Elements
     const nlpPatientRow = document.getElementById('nlpPatientRow');
     const nlpPatient = document.getElementById('nlpPatient');
@@ -152,7 +157,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const nlpDiagnosis = document.getElementById('nlpDiagnosis');
 
     ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-        if(fileInputWrapper) fileInputWrapper.addEventListener(eventName, preventDefaults, false);
+        if (fileInputWrapper) fileInputWrapper.addEventListener(eventName, preventDefaults, false);
     });
 
     function preventDefaults(e) {
@@ -161,11 +166,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     ['dragenter', 'dragover'].forEach(eventName => {
-        if(fileInputWrapper) fileInputWrapper.addEventListener(eventName, highlight, false);
+        if (fileInputWrapper) fileInputWrapper.addEventListener(eventName, highlight, false);
     });
 
     ['dragleave', 'drop'].forEach(eventName => {
-        if(fileInputWrapper) fileInputWrapper.addEventListener(eventName, unhighlight, false);
+        if (fileInputWrapper) fileInputWrapper.addEventListener(eventName, unhighlight, false);
     });
 
     function highlight(e) {
@@ -176,7 +181,7 @@ document.addEventListener('DOMContentLoaded', () => {
         fileInputWrapper.classList.remove('drag-active');
     }
 
-    if(fileInputWrapper) {
+    if (fileInputWrapper) {
         fileInputWrapper.addEventListener('drop', (e) => {
             const dt = e.dataTransfer;
             const files = dt.files;
@@ -188,7 +193,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    if(fileInput) {
+    if (fileInput) {
         fileInput.addEventListener('change', (e) => {
             if (e.target.files.length > 0) {
                 fileNameDisplay.textContent = e.target.files[0].name;
@@ -198,7 +203,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    if(uploadForm) {
+    if (uploadForm) {
         uploadForm.addEventListener('submit', async (e) => {
             e.preventDefault();
 
@@ -222,6 +227,7 @@ document.addEventListener('DOMContentLoaded', () => {
             spinner.classList.remove('hidden');
             resultCard.classList.add('hidden');
             resultCard.classList.remove('approved', 'rejected');
+            if (uploadError) uploadError.classList.add('hidden');
 
             try {
                 const response = await fetch('/api/upload', {
@@ -232,7 +238,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     body: formData
                 });
 
-                const data = await response.json();
+                const data = await response.json().catch(() => null);
 
                 if (response.status === 401 || response.status === 403) {
                     localStorage.removeItem('token');
@@ -242,14 +248,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 if (!response.ok) {
-                    throw new Error(data.message || 'Server error occurred');
+                    throw new Error((data && data.message) ? data.message : 'Server error occurred');
                 }
 
                 displayResult(data.data);
-                
+
             } catch (error) {
                 console.error('Error:', error);
-                alert('An error occurred while processing the claim: ' + error.message);
+                let errorMsg = error.message || 'An error occurred while processing the claim.';
+                if (error.name === 'TypeError' && error.message === 'Failed to fetch') {
+                    errorMsg = 'Network error: Server is unreachable. Please try again later.';
+                }
+
+                if (uploadError) {
+                    uploadError.textContent = errorMsg;
+                    uploadError.classList.remove('hidden');
+                } else {
+                    alert(errorMsg);
+                }
             } finally {
                 checkBtn.disabled = false;
                 btnText.textContent = 'Check Claim';
@@ -263,9 +279,9 @@ document.addEventListener('DOMContentLoaded', () => {
         resultCard.style.animation = 'none';
         void resultCard.offsetWidth;
         resultCard.style.animation = null;
-        
+
         probText.textContent = `${data.probability}%`;
-        
+
         if (data.decision === 'Approved') {
             resultCard.classList.add('approved');
             statusIcon.innerHTML = '✅';
@@ -277,7 +293,7 @@ document.addEventListener('DOMContentLoaded', () => {
             statusIcon.innerHTML = '❌';
             decisionText.textContent = 'Claim Rejected';
             probText.className = 'prob-high';
-            
+
             if (data.reason) {
                 reasonText.textContent = data.reason;
                 reasonContainer.classList.remove('hidden');
@@ -285,38 +301,38 @@ document.addEventListener('DOMContentLoaded', () => {
                 reasonContainer.classList.add('hidden');
             }
         }
-        
+
         // Show NLP Extracted Data if present
         const nlp = data.nlpEntities || {};
-        
+
         if (nlp.patientName) {
             nlpPatient.textContent = nlp.patientName;
             nlpPatientRow.classList.remove('hidden');
         } else {
             nlpPatientRow.classList.add('hidden');
         }
-        
+
         if (nlp.doctorName) {
             nlpDoctor.textContent = nlp.doctorName;
             nlpDoctorRow.classList.remove('hidden');
         } else {
             nlpDoctorRow.classList.add('hidden');
         }
-        
+
         if (nlp.dateOfTreatment) {
             nlpDate.textContent = nlp.dateOfTreatment;
             nlpDateRow.classList.remove('hidden');
         } else {
             nlpDateRow.classList.add('hidden');
         }
-        
+
         if (nlp.diagnosisKeywords && nlp.diagnosisKeywords.length > 0) {
             nlpDiagnosis.textContent = nlp.diagnosisKeywords.join(', ');
             nlpDiagnosisRow.classList.remove('hidden');
         } else {
             nlpDiagnosisRow.classList.add('hidden');
         }
-        
+
         setTimeout(() => {
             resultCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }, 100);

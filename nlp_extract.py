@@ -72,11 +72,11 @@ def extract_entities(text):
 
 def main():
     try:
-        if len(sys.argv) < 2:
+        text = sys.stdin.read().strip()
+        if not text:
             print(json.dumps({"error": "No text provided"}))
             sys.exit(1)
 
-        text = sys.argv[1]
         result = extract_entities(text)
 
         print(json.dumps(result))

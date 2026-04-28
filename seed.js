@@ -35,7 +35,7 @@ const seedDatabase = async () => {
         console.log('✅ Seeded users successfully!');
         console.log('- User: hospital | Pass: hospital123');
         console.log('- User: insurer | Pass: insurer123');
-        
+
         process.exit(0);
     } catch (error) {
         console.error('❌ Seeding Error:', error);

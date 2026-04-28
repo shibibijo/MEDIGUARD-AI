@@ -15,7 +15,11 @@ data = {
     'text_length': np.random.randint(100, 5000, n_samples),
     'has_critical_keywords': np.random.randint(0, 2, n_samples),
     'has_fraud_keywords': np.random.randint(0, 2, n_samples),
-    'amount_mentioned': np.random.randint(500, 100000, n_samples)
+    'amount_mentioned': np.random.randint(500, 100000, n_samples),
+    'has_doctor_name': np.random.randint(0, 2, n_samples),
+    'has_patient_name': np.random.randint(0, 2, n_samples),
+    'diagnosis_keyword_count': np.random.randint(0, 10, n_samples),
+    'has_date': np.random.randint(0, 2, n_samples)
 }
 
 df = pd.DataFrame(data)
