@@ -41,7 +41,7 @@ const upload = multer({
     }
 });
 
-router.post('/upload', protect, authorize('hospital', 'insurer'), uploadLimiter, (req, res, next) => {
+router.post('/upload', protect, authorize('hospital'), uploadLimiter, (req, res, next) => {
     upload.single('claimDocument')(req, res, function (err) {
         if (err) {
             return res.status(400).json({ success: false, message: err.message });

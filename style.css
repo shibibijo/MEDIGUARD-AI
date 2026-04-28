@@ -363,6 +363,11 @@ body {
     box-shadow: 0 0 20px rgba(239, 68, 68, 0.1);
 }
 
+.manual-review {
+    border-color: #f59e0b;
+    box-shadow: 0 0 20px rgba(245, 158, 11, 0.1);
+}
+
 /* Login Overlay */
 .login-overlay {
     position: fixed;

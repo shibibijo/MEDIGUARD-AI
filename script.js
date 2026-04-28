@@ -198,7 +198,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (e.target.files.length > 0) {
                 fileNameDisplay.textContent = e.target.files[0].name;
                 resultCard.classList.add('hidden');
-                resultCard.classList.remove('approved', 'rejected');
+                resultCard.classList.remove('approved', 'rejected', 'manual-review');
             }
         });
     }
@@ -226,7 +226,7 @@ document.addEventListener('DOMContentLoaded', () => {
             btnText.textContent = 'Processing Claim...';
             spinner.classList.remove('hidden');
             resultCard.classList.add('hidden');
-            resultCard.classList.remove('approved', 'rejected');
+            resultCard.classList.remove('approved', 'rejected', 'manual-review');
             if (uploadError) uploadError.classList.add('hidden');
 
             try {
@@ -288,6 +288,18 @@ document.addEventListener('DOMContentLoaded', () => {
             decisionText.textContent = 'Claim Approved';
             probText.className = 'prob-low';
             reasonContainer.classList.add('hidden');
+        } else if (data.decision === 'Requires Manual Review') {
+            resultCard.classList.add('manual-review');
+            statusIcon.innerHTML = '⚠️';
+            decisionText.textContent = 'Requires Manual Review';
+            probText.className = 'prob-high';
+
+            if (data.reason) {
+                reasonText.textContent = data.reason;
+                reasonContainer.classList.remove('hidden');
+            } else {
+                reasonContainer.classList.add('hidden');
+            }
         } else {
             resultCard.classList.add('rejected');
             statusIcon.innerHTML = '❌';

@@ -32,12 +32,11 @@ Ensure you have the following installed on your system:
    ```
    *(Make sure to use a virtual environment if preferred)*
 
-3. **Generate ML Model and Scaler**
-   Before running the server, you must train the ML model and generate `model.pkl` and `scaler.pkl`:
-   ```bash
-   python train.py
-   ```
-   *Note: This script generates synthetic data and trains the RandomForestClassifier.*
+## Important: Train the ML Model First
+Before starting the server, you must train the ML model:
+pip install -r requirements.txt
+python train.py
+This generates model.pkl and scaler.pkl required for fraud detection.
 
 4. **Environment Variables**
    Copy the example environment file and configure your settings:
