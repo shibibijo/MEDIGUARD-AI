@@ -13,8 +13,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const registerBtn = document.getElementById('registerBtn');
     const showRegisterBtn = document.getElementById('showRegister');
     const showLoginBtn = document.getElementById('showLogin');
-    const registerToggleWrapper = document.getElementById('registerToggleWrapper');
-    const loginToggleWrapper = document.getElementById('loginToggleWrapper');
 
     // Check Auth State
     checkAuth();
@@ -43,9 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
         loginForm.reset();
         loginError.classList.add('hidden');
         loginForm.classList.remove('hidden');
-        if (registerToggleWrapper) registerToggleWrapper.classList.remove('hidden');
         if (registerForm) registerForm.classList.add('hidden');
-        if (loginToggleWrapper) loginToggleWrapper.classList.add('hidden');
     }
 
     // Handle Login
@@ -101,9 +97,7 @@ document.addEventListener('DOMContentLoaded', () => {
         showRegisterBtn.addEventListener('click', (e) => {
             e.preventDefault();
             loginForm.classList.add('hidden');
-            if (registerToggleWrapper) registerToggleWrapper.classList.add('hidden');
             registerForm.classList.remove('hidden');
-            if (loginToggleWrapper) loginToggleWrapper.classList.remove('hidden');
             registerError.classList.add('hidden');
         });
     }
@@ -112,9 +106,7 @@ document.addEventListener('DOMContentLoaded', () => {
         showLoginBtn.addEventListener('click', (e) => {
             e.preventDefault();
             registerForm.classList.add('hidden');
-            if (loginToggleWrapper) loginToggleWrapper.classList.add('hidden');
             loginForm.classList.remove('hidden');
-            if (registerToggleWrapper) registerToggleWrapper.classList.remove('hidden');
             loginError.classList.add('hidden');
         });
     }
