@@ -385,13 +385,21 @@ body {
 
 .login-card {
     background: var(--card-bg);
-    padding: 3rem;
+    padding: 2rem;
     border-radius: 1.5rem;
     width: 100%;
     max-width: 400px;
     box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
     border: 1px solid var(--border-color);
     text-align: center;
+    overflow-y: auto;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.toggle-form {
+    flex-shrink: 0;
 }
 
 .login-card h2 {
