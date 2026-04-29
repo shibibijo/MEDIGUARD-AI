@@ -8,7 +8,7 @@ const logger = require('./logger');
 
 const runPythonScript = (scriptPath, inputData) => {
     return new Promise((resolve, reject) => {
-        let pythonCommand = 'C:\\Program Files\\Python313\\python.exe';
+       let pythonCommand = process.platform === 'win32' ? 'C:\\Program Files\\Python313\\python.exe' : 'python3';
         const pythonProcess = spawn(pythonCommand, [scriptPath]);
 
         let returnData = '';
