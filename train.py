@@ -28,7 +28,11 @@ df = pd.DataFrame(data)
 fraud_condition = (
     (df['has_fraud_keywords'] == 1) |
     ((df['text_length'] < 300) & (df['amount_mentioned'] > 20000) & (df['has_critical_keywords'] == 0)) |
-    ((df['amount_mentioned'] > 80000) & (df['has_critical_keywords'] == 0))
+    ((df['amount_mentioned'] > 80000) & (df['has_critical_keywords'] == 0)) |
+    ((df['has_doctor_name'] == 0) & (df['amount_mentioned'] > 50000)) |
+    ((df['has_patient_name'] == 0) & (df['amount_mentioned'] > 50000)) |
+    ((df['has_date'] == 0) & (df['amount_mentioned'] > 30000)) |
+    ((df['diagnosis_keyword_count'] == 0) & (df['amount_mentioned'] > 40000))
 )
 df['fraud'] = np.where(fraud_condition, 1, 0)
 df['fraud'] = np.where(np.random.rand(n_samples) > 0.9, 1 - df['fraud'], df['fraud'])
