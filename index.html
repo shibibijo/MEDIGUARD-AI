@@ -15,6 +15,17 @@
         <div class="login-card">
             <h2>Welcome to MediGuard AI</h2>
             <p>Please log in to continue</p>
+
+            <!-- Toggle links - BAHAR forms ke, hamesha visible -->
+            <div id="registerToggleWrapper" style="margin-bottom: 1rem; font-size: 0.875rem;">
+                <span>Don't have an account? </span>
+                <a href="#" id="showRegister" style="color: #10b981; text-decoration: none; font-weight: 500;">Register here</a>
+            </div>
+            <div id="loginToggleWrapper" style="margin-bottom: 1rem; font-size: 0.875rem; display: none;">
+                <span>Already have an account? </span>
+                <a href="#" id="showLogin" style="color: #10b981; text-decoration: none; font-weight: 500;">Login here</a>
+            </div>
+
             <form id="loginForm">
                 <div class="form-group">
                     <label for="username">Username</label>
@@ -30,10 +41,6 @@
                 </button>
                 <div id="loginError" class="login-error hidden">Invalid credentials</div>
             </form>
-            <div id="registerToggleWrapper" class="toggle-form" style="margin-top: 1.5rem; font-size: 0.875rem;">
-                <span>Don't have an account? </span><a href="#" id="showRegister"
-                    style="color: var(--primary-color); text-decoration: none; font-weight: 500;">Register here</a>
-            </div>
 
             <form id="registerForm" class="hidden">
                 <div class="form-group">
@@ -61,10 +68,6 @@
                 </button>
                 <div id="registerError" class="login-error hidden"></div>
             </form>
-            <div id="loginToggleWrapper" class="toggle-form hidden" style="margin-top: 1.5rem; font-size: 0.875rem;">
-                <span>Already have an account? </span><a href="#" id="showLogin"
-                    style="color: var(--primary-color); text-decoration: none; font-weight: 500;">Login here</a>
-            </div>
         </div>
     </div>
 
@@ -210,7 +213,6 @@
                                 <span>Reason</span>
                                 <p id="reasonText" class="reason-text"></p>
                             </div>
-                            <!-- NLP Extractions -->
                             <div id="nlpPatientRow" class="detail-row hidden">
                                 <span>Patient Name</span>
                                 <strong id="nlpPatient"></strong>
