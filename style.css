@@ -394,12 +394,6 @@ body {
     text-align: center;
     overflow-y: auto;
     max-height: 90vh;
-    display: flex;
-    flex-direction: column;
-}
-
-.toggle-form {
-    flex-shrink: 0;
 }
 
 .login-card h2 {
