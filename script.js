@@ -8,6 +8,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const userRoleBadge = document.getElementById('userRoleBadge');
     const logoutBtn = document.getElementById('logoutBtn');
 
+    const registerForm = document.getElementById('registerForm');
+    const registerError = document.getElementById('registerError');
+    const registerBtn = document.getElementById('registerBtn');
+    const showRegisterBtn = document.getElementById('showRegister');
+    const showLoginBtn = document.getElementById('showLogin');
+
     // Check Auth State
     checkAuth();
 
@@ -34,6 +40,8 @@ document.addEventListener('DOMContentLoaded', () => {
         mainContent.classList.add('hidden');
         loginForm.reset();
         loginError.classList.add('hidden');
+        loginForm.classList.remove('hidden');
+        if (registerForm) registerForm.classList.add('hidden');
     }
 
     // Handle Login
@@ -83,6 +91,76 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.removeItem('user');
         showLogin();
     });
+
+    // Toggle Forms
+    if (showRegisterBtn) {
+        showRegisterBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            loginForm.classList.add('hidden');
+            registerForm.classList.remove('hidden');
+            registerError.classList.add('hidden');
+        });
+    }
+
+    if (showLoginBtn) {
+        showLoginBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            registerForm.classList.add('hidden');
+            loginForm.classList.remove('hidden');
+            loginError.classList.add('hidden');
+        });
+    }
+
+    // Handle Register
+    if (registerForm) {
+        registerForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const username = document.getElementById('regUsername').value;
+            const password = document.getElementById('regPassword').value;
+            const confirmPassword = document.getElementById('regConfirmPassword').value;
+            const role = document.getElementById('regRole').value;
+
+            if (password !== confirmPassword) {
+                registerError.textContent = 'Passwords do not match';
+                registerError.classList.remove('hidden');
+                return;
+            }
+
+            registerBtn.disabled = true;
+            registerBtn.querySelector('.spinner').classList.remove('hidden');
+            registerError.classList.add('hidden');
+
+            try {
+                const response = await fetch('/api/auth/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password, role })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                    showMainApp(data.user);
+                } else {
+                    registerError.textContent = data.message || 'Registration failed';
+                    registerError.classList.remove('hidden');
+                }
+            } catch (error) {
+                if (error.name === 'TypeError' && error.message === 'Failed to fetch') {
+                    registerError.textContent = 'Network error: Server is unreachable.';
+                } else {
+                    registerError.textContent = 'Server error. Please try again.';
+                }
+                registerError.classList.remove('hidden');
+            } finally {
+                registerBtn.disabled = false;
+                registerBtn.querySelector('.spinner').classList.add('hidden');
+            }
+        });
+    }
 
     let animationsInitialized = false;
     function initAnimations() {
